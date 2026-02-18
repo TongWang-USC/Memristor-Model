@@ -12,8 +12,6 @@
 .param eta=0.01
 
 * Optional noise controls
-.param sigma1=0
-.param sigma2=0
 .param dt=1e-3
 .param kappa=200
 .param m=2
