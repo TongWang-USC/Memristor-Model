@@ -1,0 +1,33 @@
+* Diffusive memristor model core (no testbench)
+* Include this file from a dedicated test .cir.
+
+* All tunable parameters are defined in the testbench file.
+
+.func k()         { floor(time/dt) }
+.func clip01(x)   { max(0, min(1-eps, x)) }
+.func Pf(f)       { 1 - exp(-kappa * pow(clip01(f), m) * dt) }
+.func U(f)        { if(rand(k()+777) < Pf(f), 1, 0) }
+.func n_shrink(f) { U(f) * eta * clip01(f) / dt }
+
+* Random gammas for c2c variation
+.func g1(f) {gamma1 + sigma1*gamma1*f*abs(sqrt(-2*ln(rand(time/dt))) * cos(2*pi*rand(100+time/dt)))}
+.func g2(r) {gamma2 - sigma2*gamma2*r*abs(sqrt(-2*ln(rand(200+time/dt))) * cos(2*pi*rand(300+time/dt)))}
+B1 g1 0 V = g1(V(f))
+R1 g1 0 1k
+B2 g2 0 V = g2(V(r))
+R2 g2 0 1k
+
+.func df(v,f,r,g) {if((abs(v)*mu/(alpha + (1 - f - r)) - g*f - beta*f) > 1, 1, (abs(v)*mu/(alpha + (1 - f - r)) - g*f - beta*f))}
+.func df_with_noise(v,f,r,g) {df(v,f,r,g) - n_shrink(f)}
+.func dr(f,r,g) {(beta*f - g*r)}
+.func dfdt(f, r, a, b) {if((f)>1&a>0, 0, if(f<0&a<0, 0, if((f+r)>1&a+b>0, if(f>0, -b, 0), if(f+r<0&a+b<0, if((f)<1,-b,0), a))))}
+.func drdt(f, r, a, b) {if((r)>1&b>0, 0, if(r<0&b<0, 0, if((f+r)>1&a+b>0, if(f>0, b, 0), if(f+r<0&a+b<0, if((f)<1,b,0), b))))}
+
+Gf 0 f value = {dfdt(V(f), V(r), df_with_noise(V(p,n),V(f),V(r),V(g1)), dr(V(f),V(r),V(g2)))}
+Cf f 0 1 IC=0
+
+Gr 0 r value = {drdt(V(f), V(r), df_with_noise(V(p,n),V(f),V(r),V(g1)), dr(V(f),V(r),V(g2)))}
+Cr r 0 1 IC=0
+
+BIMx p n I = {limit((V(p)-V(n))/(Ron*min(abs(V(f)+V(r)),1) + Roff*(exp((1-min(abs(V(f)+V(r)),1))/lamda)-1)/(exp(1/lamda)-1)), 0, 1e-2)}
+Cp p n 1e-11

@@ -1,5 +1,4 @@
-** test circuit for selector
-.include General model.cir
+** test circuit for Drift Memristor
 * Use this for repeating pulses
 
 
@@ -11,18 +10,38 @@
 .param ton = 50us
 .param ttotal = 0.5ms
 .param cycles = 2
+
+* model parameters (can be tuned per test)
+.param n = 3
+.param m = 5
+.param h0 = 0
+.param hmax = 15e-9
+.param h1 = 1e-9
+.param h2 = 5e-9
+.param h_lambda = 1e-8
+.param s0 = 1e-16
+.param alpha = 1.329e-11
+.param beta = 2.659e-13
+.param sigma = 1.061e-8
+.param eta = 1.25e-16
+.param theta = 0.32
+.param Ron = 0.47e3
+.param Roff = 1.7e3
+.param cc = 1e-2
+
+.include "Drift_model_core.cir"
 * memristor
 *Syntax: Vxxx n+ n- PULSE(V1 V2 Tdelay Trise Tfall Ton Tperiod Ncycles)
 V1 p p1 pulse(0 {vset-vread} {tdelay} {tedge} {tedge} {ton} {ttotal} {cycles})
 V2 p1 p2 pulse(0 {vreset-vread} {2*tdelay+2*tedge+ton} {tedge} {tedge} {ton} {ttotal} {cycles})
 V3 p2 0 pulse(0 {vread} 0us {tedge} {tedge} 15ms {ttotal} {cycles})
-
-
-XBipolar p 0 memristor n = 3, m = 5, h1 = 1e-9, h2=5e-9, alpha=1.329e-11, beta=2.659e-13, sigma=1.061e-08, eta = 1.25e-16, theta = 0.32, Ron = 0.47e3, Roff = 1.7e3, cc = 1e-2
+Vn n 0 0
 
 * Transient simulation
 * Transient simulation
 .TRAN 1us {ttotal*cycles} 0 .0001ms
+.save V(p) V(n) V(h) V(s) I(BIx)
+.plot tran V(p) V(h) V(s) I(BIx)
 .PROBE
 .END
 

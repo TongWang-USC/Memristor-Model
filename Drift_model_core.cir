@@ -1,0 +1,30 @@
+* Drift memristor model core (no subckt)
+* This file is intended to be included by a testbench .cir file.
+
+* All tunable parameters are defined in the testbench file.
+
+* Dynamic equations for internal state variables h and s
+Gh 0 h_ value= {dhdt(V(p,n), V(h), V(s_))}
+Ch h_ 0 1 IC={h0}
+Rh h h_ 1e-12
+Eh h 0 value = {limit(V(h_), -1e-11, 1.0001*hmax)}
+
+Gs 0 s_ value= {dsdt(V(p,n), V(h), V(s))}
+Cs s_ 0 1 IC={s0}
+Rs s s_ 1e-12
+Es s 0 value = {limit(V(s_), 0.9999*s0, 1.001*s0)}
+
+.func dhdt(v, h, s) {if(iout(v, h, s)<cc, dhdt_(v, h, s), 0)}
+.func dsdt(v, h, s) {dsdt_(v, h, s)}
+
+.func dhdt_(v, h, s) {if(h<hmax | (h>=hmax & dsdt__(v, h, s)<0 & s<=s0), dhdt__(v, h, s), 0)}
+.func dsdt_(v, h, s) {if(h<hmax | (h>=hmax & dsdt__(v, h, s)<0 & s<=s0), 0, dsdt__(v, h, s))}
+
+.func dhdt__(v, h, s) {alpha*pow(v,n)/(sqrt(2*Pi)*sigma)*exp(-0.5*pow((h-h1)/sigma,2)) - beta*h/hmax/(sqrt(2*Pi)*sigma)*exp(-0.5*pow((h-h2)/sigma,2))}
+.func dsdt__(v, h, s) {eta*pow(v,m)*exp(-s)-theta*s}
+
+.func memristance(h, s) {Ron*h/hmax*sqrt(s0/s) + Roff*(exp(hmax/h_lambda-h/h_lambda)-1)/(exp(hmax/h_lambda)-1)}
+.func iout(v, h, s) = min(v/memristance(limit(h,0,hmax), limit(s,0.9999*s0,1.001*s0)), cc)
+
+* Device current between p and n
+BIx p n I = iout(V(p)-V(n), V(h), V(s))

@@ -1,0 +1,46 @@
+* Diffusive memristor test: multiple current pulses input
+
+* Model parameters
+.param alpha=0.1
+.param lamda=0.1
+.param Ron=1.7e4
+.param Roff=1e10
+.param mu=16
+.param beta=0.2
+.param gamma1=50
+.param gamma2=0.42
+.param eta=0.01
+
+* Optional noise controls
+.param sigma1=0
+.param sigma2=0
+.param dt=1e-3
+.param kappa=200
+.param m=2
+.param eps=1e-12
+
+* Multi-pulse current stimulus
+.param Iamp=0.2u
+.param tdelay=1ms
+.param trise=10us
+.param tfall=10us
+.param ton=900ms
+.param tperiod=1s
+.param cycles=20
+.param tstop={tdelay + cycles*tperiod + 10ms}
+
+.include "Diffusive_model_core.cir"
+
+Iin 0 in PULSE(0 {Iamp} {tdelay} {trise} {tfall} {ton} {tperiod} {cycles})
+Rs in p 50
+Rp p n 1e7
+Cp2 p n 1e-6
+Vgnd n 0 0
+
+.tran 0 {tstop} 0 0.1ms
+
+* Save both input pulse and device response
+.save V(in) I(Iin) V(p) V(n) V(f) V(r) I(BIMx)
+.plot tran I(Iin) V(in) V(p) V(f) V(r) I(BIMx)
+.probe
+.end
