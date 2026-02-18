@@ -72,6 +72,14 @@ In `Test bipolar.cir`, you can tune:
 - The core files are intended to be included by testbenches; keep model equations in core files and experiment settings in test files.
 - Some tests use long transient times (seconds scale) and may take longer to simulate depending on timestep and simulator settings.
 
+## References
+
+[1] T. Wang et al., "A faithful and compact diffusive memristor model," IEEE Trans. Circuits Syst. Artif. Intell., vol. 1, no. 2, pp. 141-148, Dec. 2024, doi:10.1109/TCASAI.2024.3484370.
+
+[2] R. Zhao et al., "A spiking artificial neuron based on one diffusive memristor, one transistor and one resistor," Nat. Electron., vol. 8, pp. 1211-1221, 2025, doi:10.1038/s41928-025-01488-x.
+
+[3] Y. Zhuo et al., "A dynamical compact model of diffusive and drift memristors for neuromorphic computing," Adv. Electron. Mater., vol. 8, no. 8, 2022, doi:10.1002/aelm.202270040.
+
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
