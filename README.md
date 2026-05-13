@@ -1,5 +1,7 @@
 # Memristor-Model
 
+[![DOI](https://zenodo.org/badge/1157621584.svg)](https://doi.org/10.5281/zenodo.20150590)
+
 SPICE models and testbenches for **Diffusive Memristor** and **Drift Memristor**.
 
 ## Overview
